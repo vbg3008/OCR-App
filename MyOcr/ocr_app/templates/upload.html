@@ -1,16 +1,36 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Upload Image</title>
-</head>
-<body>
-    <h1>Upload Image for OCR</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Upload</button>
-    </form>
-    <hr>
-    <a href="{% url 'capture_image' %}">Capture Image with Webcam</a>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Upload Image - OCR App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Upload Image for OCR</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.image.label_tag }}
+                        {% render_field form.image class="form-control" %}
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload"></i> Upload
+                        </button>
+                    </div>
+                </form>
+                <hr>
+                <div class="d-grid">
+                    <a href="{% url 'capture_image' %}" class="btn btn-secondary">
+                        <i class="bi bi-camera"></i> Capture Image with Webcam
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,10 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>OCR Result</title>
-</head>
-<body>
-    <h1>Extracted Text</h1>
-    <pre>{{ text }}</pre>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}OCR Result - OCR App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Extracted Text</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Your Extracted Text:</h5>
+                <pre class="card-text bg-light p-3 rounded">{{ text }}</pre>
+                <div class="d-flex justify-content-between mt-3">
+                    <a href="{% url 'upload_image' %}" class="btn btn-primary">
+                        <i class="bi bi-upload"></i> Upload Another Image
+                    </a>
+                    <a href="{% url 'capture_image' %}" class="btn btn-secondary">
+                        <i class="bi bi-camera"></i> Capture Another Image
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

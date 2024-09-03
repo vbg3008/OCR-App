@@ -1,68 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capture Image with Webcam</title>
-    <style>
-        video {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-        }
-        canvas {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <h1>Capture Image for OCR</h1>
-    
-    <!-- Video element to show the webcam feed -->
-    <video id="video" autoplay></video>
-    
-    <!-- Button to capture the image -->
-    <button id="capture">Capture Image</button>
-    
-    <!-- Canvas to hold the captured image -->
-    <canvas id="canvas"></canvas>
-    
-    <!-- Hidden form to send the captured image to the server -->
-    <form id="image-form" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="hidden" name="image" id="image-data">
-        <button type="submit" id="submit">Submit Captured Image</button>
-    </form>
+{% extends 'base.html' %}
 
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const captureButton = document.getElementById('capture');
-        const submitButton = document.getElementById('submit');
-        const imageData = document.getElementById('image-data');
-        const context = canvas.getContext('2d');
+{% block title %}Capture Image - OCR App{% endblock %}
 
-        // Get access to the camera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then((stream) => {
-                video.srcObject = stream;
-            })
-            .catch((err) => {
-                console.error('Error accessing the camera: ', err);
-            });
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Capture Image with Webcam</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <video id="video" class="img-fluid rounded" autoplay playsinline></video>
+                </div>
+                <button id="capture" class="btn btn-success mb-3">
+                    <i class="bi bi-camera-fill"></i> Capture Image
+                </button>
+                <canvas id="canvas" class="img-fluid rounded mb-3" style="display: none;"></canvas>
+                
+                <form id="image-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="image" id="image-data">
+                    <div class="d-grid">
+                        <button type="submit" id="submit" class="btn btn-primary" style="display: none;">
+                            <i class="bi bi-upload"></i> Submit Captured Image
+                        </button>
+                    </div>
+                </form>
 
-        // Capture the image from the video feed
-        captureButton.addEventListener('click', () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                <!-- Loading Spinner -->
+                <div id="loading" class="d-none mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p>Processing your image...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            // Convert the image to a data URL and store it in the hidden input field
-            imageData.value = canvas.toDataURL('image/png');
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('capture');
+    const submitButton = document.getElementById('submit');
+    const imageData = document.getElementById('image-data');
+    const loading = document.getElementById('loading');
+    const context = canvas.getContext('2d');
 
-            // Show the submit button
-            submitButton.style.display = 'block';
+    // Access the webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+            video.srcObject = stream;
+        })
+        .catch((err) => {
+            console.error('Error accessing the camera: ', err);
+            alert('Unable to access the camera. Please check your device and permissions.');
         });
-    </script>
-</body>
-</html>
+
+    // Capture the image
+    captureButton.addEventListener('click', () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        const dataURL = canvas.toDataURL('image/png');
+        imageData.value = dataURL;
+
+        // Show the captured image
+        canvas.style.display = 'block';
+
+        // Show the submit button
+        submitButton.style.display = 'block';
+    });
+
+    // Show loading spinner on form submit
+    const form = document.getElementById('image-form');
+    form.addEventListener('submit', () => {
+        loading.classList.remove('d-none');
+    });
+</script>
+{% endblock %}
